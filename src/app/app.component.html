@@ -1,6 +1,8 @@
 <p-tabView>
   <p-tabPanel header="Clock">
-    Here must be a clock that shows the current time in hours, minutes and seconds.
+    <div class="clock">
+      {{currentTime() | date : 'H:mm:ss'}}
+    </div>
   </p-tabPanel>
   <p-tabPanel header="Timer">
     Here must be a timer that allows the user to select an amount of times (in minutes and seconds) and then shows the
@@ -8,16 +10,16 @@
     <div class="timer-container">
       <div class="time-selectors">
         <div class="time-selector">
-          <p-knob [min]="0" [max]="60" [size]="300" />
+          <p-knob [ngModel]="timeLeftDisplay()?.minutes" (ngModelChange)="selectedMinutes.set($event)" [min]="0" [max]="60" [size]="300" />
           <label>Minutes</label>
         </div>
         <div class="time-selector">
-          <p-knob [min]="0" [max]="60" [size]="300" />
+          <p-knob [ngModel]="timeLeftDisplay()?.seconds" (ngModelChange)="selectedSeconds.set($event)" [min]="0" [max]="60" [size]="300" />
           <label>Seconds</label>
         </div>
       </div>
       <div class="actions">
-        <p-button [label]="'Start'" />
+        <p-button [label]="'Start'" (click)="startTimer$.next()"/>
         <p-button [label]="paused() ? 'Resume' : 'Pause'" (click)="paused.set(!paused())" />
       </div>
     </div>
@@ -27,7 +29,11 @@
     user to select other cities. See <a href="https://worldtimeapi.org/" target="_blank">https://worldtimeapi.org/</a>
     for options.
     <p-panel header="Time in the world">
-      <p-multiSelect [options]="timezones()" placeholder="Add new location" />
+      <p-multiSelect [options]="timezones()" [ngModel]="selectedTimezones()" (ngModelChange)="addLocation($event)" placeholder="Add new location" />
+
+      @for (time of timeInLocations(); track time.timezone) {
+        <p>Time in {{time.timezone}} is {{time.datetime | date : 'H:mm'}}</p>
+      }
     </p-panel>
   </p-tabPanel>
 </p-tabView>
